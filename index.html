@@ -134,7 +134,10 @@
         .sudoku-cell.given {
             background: #f5f5f5;
             font-weight: bold;
-            cursor: default;
+        }
+
+        .sudoku-cell.highlighted {
+            background: #e8ebfa;
         }
 
         .sudoku-cell.selected {
@@ -322,6 +325,7 @@
 
     <script type="module">
         import { calculateProgressPercent } from './progress-logic.mjs';
+        import { isPeerCell } from './peer-logic.mjs';
 
         const BOARD_SIZE = 9;
         const SUBGRID_SIZE = 3;
@@ -469,8 +473,11 @@
             }
 
             selectCell(row, col) {
-                if (this.puzzle[row][col] !== 0) return;
-                this.selectedCell = { row, col };
+                if (this.selectedCell && this.selectedCell.row === row && this.selectedCell.col === col) {
+                    this.selectedCell = null;
+                } else {
+                    this.selectedCell = { row, col };
+                }
                 this.render();
             }
 
@@ -561,9 +568,11 @@
 
                         if (this.selectedCell && this.selectedCell.row === row && this.selectedCell.col === col) {
                             cell.classList.add('selected');
+                        } else if (this.selectedCell && isPeerCell(row, col, this.selectedCell.row, this.selectedCell.col)) {
+                            cell.classList.add('highlighted');
                         }
 
-                        if (!isGiven && !this.showingSolution) {
+                        if (!this.showingSolution) {
                             cell.addEventListener('click', () => this.selectCell(row, col));
                         }
 
