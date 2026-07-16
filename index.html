@@ -320,7 +320,9 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { calculateProgressPercent } from './progress-logic.mjs';
+
         const BOARD_SIZE = 9;
         const SUBGRID_SIZE = 3;
 
@@ -572,6 +574,7 @@
 
             updateStats() {
                 let filled = 0;
+                let given = 0;
                 let errors = 0;
 
                 for (let row = 0; row < BOARD_SIZE; row++) {
@@ -582,11 +585,12 @@
                                 errors++;
                             }
                         }
+                        if (this.puzzle[row][col] !== 0) given++;
                     }
                 }
 
-                const totalCells = BOARD_SIZE * BOARD_SIZE - this.cellsToRemove[this.difficulty];
-                const progress = Math.round((filled / totalCells) * 100);
+                const totalOpen = this.cellsToRemove[this.difficulty];
+                const progress = calculateProgressPercent({ filled, given, totalOpen });
 
                 document.getElementById('filledCount').textContent = filled;
                 document.getElementById('errorCount').textContent = errors;
