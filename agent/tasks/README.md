@@ -25,4 +25,4 @@ Add a row to the table below (newest first) and a matching file named
 
 | Doc | Date | Commit/PR | Summary |
 |-----|------|-----------|---------|
-| _(none currently)_ | | | |
+| [0001-cell-cross-box-highlight.md](0001-cell-cross-box-highlight.md) | 2026-07-16 | #7 | 選取格子時高亮同行同列與所屬宮格 |
