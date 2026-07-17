@@ -1,0 +1,19 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run unit tests
+        run: node --test
+      - name: Check formatting (advisory)
+        run: npx --yes prettier --check "**/*.{mjs,html,css}" || echo "::warning::Prettier check failed (existing code not yet conformed, see chore issue)"

@@ -1,0 +1,38 @@
+name: Claude Issue Sweeper
+
+on:
+  schedule:
+    - cron: "0 1 * * 1-5"   # 平日 09:00 (UTC+8)
+  workflow_dispatch: {}      # 也可手動觸發
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code (issue sweep)
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            你是本 repo 的 issue 值班 agent。請用 gh 指令列出所有 open issues，
+            依 AGENTS.md 的規則挑「一張」最高優先且可執行的 issue：
+            - bug 優先於 feature；有明確重現步驟者優先；有未解相依（依賴其他 open issue）者跳過
+            - 若該 issue 缺重現資訊，改為在 issue 留言請求補充，然後結束
+            - 若無可執行 issue，直接結束，不要產生任何變更
+            選定後：提出簡短計畫（留言到該 issue）→ 依 AGENTS.md 實作 →
+            跑 node --test 與 npx prettier --check → push 分支並在 issue 留言附
+            Create PR 連結。一次只處理一張 issue。
+          claude_args: |
+            --max-turns 40
+            --allowedTools "Bash(node:*),Bash(npx prettier:*),Bash(gh issue:*),Bash(gh pr:*)"
